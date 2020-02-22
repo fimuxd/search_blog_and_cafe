@@ -1,0 +1,44 @@
+PODS:
+  - Nimble (8.0.5)
+  - RxAppState (1.6.0):
+    - RxCocoa (~> 5.0)
+    - RxSwift (~> 5.0)
+  - RxCocoa (5.0.1):
+    - RxRelay (~> 5)
+    - RxSwift (~> 5)
+  - RxRelay (5.0.1):
+    - RxSwift (~> 5)
+  - RxSwift (5.0.1)
+  - SnapKit (4.2.0)
+  - Stubber (1.5.0)
+
+DEPENDENCIES:
+  - Nimble
+  - RxAppState
+  - RxCocoa
+  - RxSwift
+  - SnapKit
+  - Stubber
+
+SPEC REPOS:
+  trunk:
+    - Nimble
+    - RxAppState
+    - RxCocoa
+    - RxRelay
+    - RxSwift
+    - SnapKit
+    - Stubber
+
+SPEC CHECKSUMS:
+  Nimble: 4ab1aeb9b45553c75b9687196b0fa0713170a332
+  RxAppState: b633d7370970ecb80081912ea08a7bf3eb644b4e
+  RxCocoa: e741b9749968e8a143e2b787f1dfbff2b63d0a5c
+  RxRelay: 89d54507f4fd4d969e6ec1d4bd7f3673640b4640
+  RxSwift: e2dc62b366a3adf6a0be44ba9f405efd4c94e0c4
+  SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
+  Stubber: 6cf1160d37f0d1da7afbe1892f65bb7d5984bba4
+
+PODFILE CHECKSUM: cd59b13d411f065d49790dc513985b75460138a8
+
+COCOAPODS: 1.8.4
