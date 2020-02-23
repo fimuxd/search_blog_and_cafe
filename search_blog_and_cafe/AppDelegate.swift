@@ -7,21 +7,19 @@
 //
 
 import UIKit
-import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        let rootViewController = SearchListViewController()
-        let rootViewModel = SearchListViewModel()
+        self.window = UIWindow()
+        let rootViewController = BaseViewController()
+        let rootViewModel = BaseViewModel()
         rootViewController.bind(rootViewModel)
         
         window?.rootViewController = rootViewController
         window?.makeKeyAndVisible()
-        
         return true
     }
 }
