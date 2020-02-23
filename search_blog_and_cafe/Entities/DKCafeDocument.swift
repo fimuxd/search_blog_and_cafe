@@ -13,11 +13,12 @@ struct DKCafeDocument: Codable {
     let contents: String
     let url: URL?
     let cafeName: String
-    let thumbnail: String
+    let thumbnailURL: URL?
     let datetime: Date?
     
     enum CodingKeys: String, CodingKey {
-        case title, contents, url, thumbnail, datetime
+        case title, contents, url, datetime
+        case thumbnailURL = "thumbnail"
         case cafeName = "cafename"
     }
     

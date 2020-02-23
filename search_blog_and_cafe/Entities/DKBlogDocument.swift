@@ -13,11 +13,12 @@ struct DKBlogDocument: Codable {
     let contents: String
     let url: URL?
     let blogName: String
-    let thumbnail: String
+    let thumbnailURL: URL?
     let datetime: Date?
     
     enum CodingKeys: String, CodingKey {
-        case title, contents, url, thumbnail, datetime
+        case title, contents, url, datetime
+        case thumbnailURL = "thumbnail"
         case blogName = "blogname"
     }
     
