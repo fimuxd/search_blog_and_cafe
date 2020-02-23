@@ -22,7 +22,8 @@ extension Date {
     static func from(dateString: String) -> Date? {
         let dateFormatter = DateFormatter()
         
-        dateFormatter.dateFormat = "[YYYY]-[MM]-[DD]T[hh]:[mm]:[ss].000+[tz]"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+        dateFormatter.locale = Locale(identifier: "ko_kr")
         if let date = dateFormatter.date(from: dateString) {
             return date
         }

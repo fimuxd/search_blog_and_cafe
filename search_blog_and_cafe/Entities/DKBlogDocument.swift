@@ -27,9 +27,9 @@ struct DKBlogDocument: Codable {
         
         self.title = try values.decode(String.self, forKey: .title)
         self.contents = try values.decode(String.self, forKey: .contents)
-        self.url = try? values.decode(URL.self, forKey: .url)
+        self.url = URL.parse(values, key: .url)
         self.blogName = try values.decode(String.self, forKey: .blogName)
-        self.thumbnail = try values.decode(String.self, forKey: .thumbnail)
+        self.thumbnailURL = URL.parse(values, key: .thumbnailURL)
         self.datetime = Date.parse(values, key: .datetime)
     }
 }
