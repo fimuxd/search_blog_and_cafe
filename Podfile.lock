@@ -1,4 +1,5 @@
 PODS:
+  - Kingfisher (4.10.1)
   - Nimble (8.0.5)
   - RxAppState (1.6.0):
     - RxCocoa (~> 5.0)
@@ -13,6 +14,7 @@ PODS:
   - Stubber (1.5.0)
 
 DEPENDENCIES:
+  - Kingfisher
   - Nimble
   - RxAppState
   - RxCocoa
@@ -22,6 +24,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Kingfisher
     - Nimble
     - RxAppState
     - RxCocoa
@@ -31,6 +34,7 @@ SPEC REPOS:
     - Stubber
 
 SPEC CHECKSUMS:
+  Kingfisher: c148cd7b47ebde9989f6bc7c27dcaa79d81279a0
   Nimble: 4ab1aeb9b45553c75b9687196b0fa0713170a332
   RxAppState: b633d7370970ecb80081912ea08a7bf3eb644b4e
   RxCocoa: e741b9749968e8a143e2b787f1dfbff2b63d0a5c
@@ -39,6 +43,6 @@ SPEC CHECKSUMS:
   SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
   Stubber: 6cf1160d37f0d1da7afbe1892f65bb7d5984bba4
 
-PODFILE CHECKSUM: cd59b13d411f065d49790dc513985b75460138a8
+PODFILE CHECKSUM: b5980e8a510ea6aee1d889381eafec8a575e6d99
 
 COCOAPODS: 1.8.4
