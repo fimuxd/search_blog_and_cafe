@@ -57,7 +57,6 @@ class SearchListView: UITableView {
     }
     
     private func attribute() {
-        self.backgroundView = UIView()
         self.backgroundColor = .white
         self.register(SearchListCell.self, forCellReuseIdentifier: "SearchListCell")
         self.separatorStyle = .singleLine

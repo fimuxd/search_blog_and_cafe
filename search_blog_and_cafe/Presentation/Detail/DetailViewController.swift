@@ -60,9 +60,10 @@ class DetailViewController: UIViewController {
     private func attribute() {
         view.backgroundColor = .white
         
-        contentView.alignment = .center
+        contentView.alignment = .fill
         contentView.axis = .vertical
-        contentView.distribution = .equalSpacing
+        contentView.distribution = .fill
+        contentView.spacing = 8
         
         thumbnailImageView.contentMode = .scaleAspectFit
         
@@ -89,9 +90,8 @@ class DetailViewController: UIViewController {
         view.addSubview(contentView)
         
         contentView.snp.makeConstraints {
-            $0.top.equalTo(topLayoutGuide.snp.bottom).inset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalTo(bottomLayoutGuide.snp.top).inset(20)
+            $0.center.equalToSuperview()
         }
         
         thumbnailImageView.snp.makeConstraints {
