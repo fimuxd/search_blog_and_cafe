@@ -25,7 +25,9 @@ struct MainViewModel: MainViewBindable {
     let typeSelected = PublishRelay<FilterType>()
     let alertActionTapped = PublishRelay<AlertAction>()
     
-    let resultData = PublishSubject<[SearchListCellData]>()
+    private let blogData = PublishSubject<DKBlog?>()
+    private let cafeData = PublishSubject<DKCafe?>()
+    private let cellData = PublishSubject<[SearchListCellData]>()
     
     init(model: MainModel = MainModel()) {
         typeListCellData = Driver.of([FilterType.all, FilterType.blog, FilterType.cafe])
@@ -43,7 +45,7 @@ struct MainViewModel: MainViewBindable {
         
         
         push = listViewModel.itemSelected
-            .withLatestFrom(resultData) { $1[$0] }
+            .withLatestFrom(cellData) { $1[$0] }
             .map { DetailViewModel(data: $0) }
             .map { PushableView.detailView($0) }
             .asDriver(onErrorDriveWith: .empty())
@@ -53,25 +55,52 @@ struct MainViewModel: MainViewBindable {
             .bind(to: listViewModel.headerViewModel.shouldUpdateType)
 //            .disposed(by: disposeBag)
         
-        let currentType = listViewModel.headerViewModel.currentType
+        let searchCondition = Observable
+            .combineLatest(
+                searchViewModel.shouldLoadResult,
+                listViewModel.headerViewModel.currentType
+            ) { (result: $0, type: $1) }
         
-        let blogResult = searchViewModel.shouldLoadResult
-            .withLatestFrom(currentType) { (result: $0, type: $1) }
+        //MARK: BlogData
+        let blogResult = searchCondition
             .filter { !($0.type == .cafe) }
             .map { $0.result }
             .flatMapLatest { model.searchBlog(query: $0!) }
             .share()
+                
+        let currentBlogData = Observable
+            .combineLatest(blogData, cellData)
+        
+        let shouldMoreBlogData = Observable
+            .combineLatest(
+                listViewModel.willDisplayCell,
+                cellData
+            )
+            .map(model.shouldMoreFetch)
+        
+        let updatedBlogResult = shouldMoreBlogData
+            .filter { $0 }
+            .withLatestFrom(currentBlogData) { ($1.0, $1.1, .blog) }
+            .map(model.nextPage)
+            .withLatestFrom(searchViewModel.shouldLoadResult) { (query: $1 ?? "", page: $0) }
+            .flatMapLatest(model.searchBlog)
+            .share()
 
-        let blogValue = blogResult
+        let blogValue = Observable
+            .merge(blogResult, updatedBlogResult)
             .map { data -> DKBlog? in
                 guard case .success(let value) = data else {
                     return nil
                 }
                 return value
             }
-            .map(model.blogResultToCellData)
         
-        let blogError = blogResult
+        blogValue
+            .bind(to: blogData)
+            .disposed(by: disposeBag)
+        
+        let blogError = Observable
+            .merge(blogResult, updatedBlogResult)
             .map { data -> String? in
                 guard case .failure(let error) = data else {
                     return nil
@@ -79,23 +108,46 @@ struct MainViewModel: MainViewBindable {
                 return error.message
             }
         
-        let cafeResult = searchViewModel.shouldLoadResult
-            .withLatestFrom(currentType) { (result: $0, type: $1) }
+        //MARK: CafeData
+        let cafeResult = searchCondition
             .filter { !($0.type == .blog) }
             .map { $0.result }
             .flatMapLatest { model.searchCafe(query: $0!) }
             .share()
         
-        let cafeValue = cafeResult
+        let currentCafeData = Observable
+            .combineLatest(cafeData, cellData)
+        
+        let shouldMoreCafeData = Observable
+            .combineLatest(
+                listViewModel.willDisplayCell,
+                cellData
+            )
+            .map(model.shouldMoreFetch)
+        
+        let updatedCafeResult = shouldMoreCafeData
+            .filter { $0 }
+            .withLatestFrom(currentCafeData) { ($1.0, $1.1, .cafe) }
+            .map(model.nextPage)
+            .withLatestFrom(searchViewModel.shouldLoadResult) { (query: $1 ?? "", page: $0) }
+            .flatMapLatest(model.searchCafe)
+            .share()
+        
+        let cafeValue = Observable
+            .merge(cafeResult, updatedCafeResult)
             .map { data -> DKCafe? in
                 guard case .success(let value) = data else {
                     return nil
                 }
                 return value
             }
-            .map(model.cafeResultToCellData)
         
-        let cafeError = cafeResult
+        cafeValue
+            .bind(to: cafeData)
+            .disposed(by: disposeBag)
+        
+        let cafeError = Observable
+            .merge(cafeResult, updatedCafeResult)
             .map { data -> String? in
                 guard case .failure(let error) = data else {
                     return nil

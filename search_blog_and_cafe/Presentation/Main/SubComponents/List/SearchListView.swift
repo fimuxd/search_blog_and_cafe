@@ -13,6 +13,7 @@ protocol SearchListViewBindable {
     var headerViewModel: FilterViewModel { get }
     var searhListCellData: Driver<[SearchListCellData]> { get }
     var itemSelected: PublishRelay<Int> { get }
+    var willDisplayCell: PublishRelay<Int> { get }
 }
 
 class SearchListView: UITableView {
@@ -47,6 +48,11 @@ class SearchListView: UITableView {
         self.rx.itemSelected
             .map { $0.row }
             .bind(to: viewModel.itemSelected)
+            .disposed(by: disposeBag)
+        
+        self.rx.willDisplayCell
+            .map { $0.indexPath.row }
+            .bind(to: viewModel.willDisplayCell)
             .disposed(by: disposeBag)
     }
     
