@@ -21,7 +21,14 @@ struct DetailViewModel: DetailViewBindable {
         layoutComponents = Signal.of(data)
         
         push = urlButtonTapped
-            .map { PushableView.safariView(data.url) }
+            .map { _ in
+                guard let url = data.url else {
+                    return nil
+                }
+                return DetailWebViewModel(urlRequest: URLRequest(url: url), title: data.title ?? "")
+            }
+            .filter { $0 != nil }
+            .map { PushableView.webView($0!) }
             .asDriver(onErrorDriveWith: .empty())
     }
 }

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SafariServices
 
 protocol Pushable {
     func push(from: UINavigationController) throws
@@ -15,7 +14,7 @@ protocol Pushable {
 
 enum PushableView: Pushable {
     case detailView(DetailViewBindable)
-    case safariView(URL?)
+    case webView(DetailWebViewBindable)
     
     func push(from: UINavigationController) throws {
         switch self {
@@ -27,12 +26,13 @@ enum PushableView: Pushable {
                 viewController,
                 animated: true
             )
-        case .safariView(let url):
-            guard let url = url else { return }
-            from.present(
-                SFSafariViewController(url: url),
-                animated: true,
-                completion: nil
+        case .webView(let viewModel):
+            let viewController = DetailWebViewController()
+            viewController.bind(viewModel)
+            
+            from.pushViewController(
+                viewController,
+                animated: true
             )
         }
     }
