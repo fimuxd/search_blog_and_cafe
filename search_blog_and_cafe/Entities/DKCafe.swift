@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct DKCafe: Codable {
+struct DKCafe: Codable, DKData {
     let meta: DKMeta
-    let documents: [DKCafeDocument]
+    let documents: [DKDocument]
 }

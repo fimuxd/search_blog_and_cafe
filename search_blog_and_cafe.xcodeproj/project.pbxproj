@@ -35,9 +35,10 @@
 		7DE3F426240019D0004D6932 /* DKBlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F425240019D0004D6932 /* DKBlog.swift */; };
 		7DE3F42824001A1A004D6932 /* DKCafe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F42724001A1A004D6932 /* DKCafe.swift */; };
 		7DE3F42A24001A37004D6932 /* DKMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F42924001A37004D6932 /* DKMeta.swift */; };
-		7DE3F42C24001A91004D6932 /* DKBlogDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F42B24001A91004D6932 /* DKBlogDocument.swift */; };
 		7DE3F43024001C76004D6932 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F42F24001C76004D6932 /* Date.swift */; };
-		7DE3F43224001D3A004D6932 /* DKCafeDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F43124001D3A004D6932 /* DKCafeDocument.swift */; };
+		7DE3F43224001D3A004D6932 /* DKDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE3F43124001D3A004D6932 /* DKDocument.swift */; };
+		7DF82C1224034D10002919CE /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF82C1124034D10002919CE /* String.swift */; };
+		7DF82C1524038938002919CE /* FilterType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF82C1424038938002919CE /* FilterType.swift */; };
 		9B9FD1082440D2DBFF6F3D43 /* Pods_search_blog_and_cafe.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDED87D03F020B469BDDEE2A /* Pods_search_blog_and_cafe.framework */; };
 /* End PBXBuildFile section */
 
@@ -84,9 +85,10 @@
 		7DE3F425240019D0004D6932 /* DKBlog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DKBlog.swift; sourceTree = "<group>"; };
 		7DE3F42724001A1A004D6932 /* DKCafe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DKCafe.swift; sourceTree = "<group>"; };
 		7DE3F42924001A37004D6932 /* DKMeta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DKMeta.swift; sourceTree = "<group>"; };
-		7DE3F42B24001A91004D6932 /* DKBlogDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DKBlogDocument.swift; sourceTree = "<group>"; };
 		7DE3F42F24001C76004D6932 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
-		7DE3F43124001D3A004D6932 /* DKCafeDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DKCafeDocument.swift; sourceTree = "<group>"; };
+		7DE3F43124001D3A004D6932 /* DKDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DKDocument.swift; sourceTree = "<group>"; };
+		7DF82C1124034D10002919CE /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		7DF82C1424038938002919CE /* FilterType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterType.swift; sourceTree = "<group>"; };
 		A95B41790FC9C0C880F713F6 /* Pods-search_blog_and_cafe.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-search_blog_and_cafe.release.xcconfig"; path = "Target Support Files/Pods-search_blog_and_cafe/Pods-search_blog_and_cafe.release.xcconfig"; sourceTree = "<group>"; };
 		BB1EC0EE2E105429A6EE99A6 /* Pods-search_blog_and_cafeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-search_blog_and_cafeTests.debug.xcconfig"; path = "Target Support Files/Pods-search_blog_and_cafeTests/Pods-search_blog_and_cafeTests.debug.xcconfig"; sourceTree = "<group>"; };
 		CB8E07E85EC14EE7A7F08F72 /* Pods_search_blog_and_cafeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_search_blog_and_cafeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -250,9 +252,9 @@
 				7DE3F425240019D0004D6932 /* DKBlog.swift */,
 				7DE3F42724001A1A004D6932 /* DKCafe.swift */,
 				7DE3F42924001A37004D6932 /* DKMeta.swift */,
-				7DE3F42B24001A91004D6932 /* DKBlogDocument.swift */,
-				7DE3F43124001D3A004D6932 /* DKCafeDocument.swift */,
+				7DE3F43124001D3A004D6932 /* DKDocument.swift */,
 				7DDC57EA240248E4000E49F6 /* SearchListCellData.swift */,
+				7DF82C1424038938002919CE /* FilterType.swift */,
 				7D46F194240271AB006FC1C5 /* Pushable.swift */,
 			);
 			path = Entities;
@@ -264,6 +266,7 @@
 				7DE3F42F24001C76004D6932 /* Date.swift */,
 				7D46F19624027D6B006FC1C5 /* URL.swift */,
 				7D711DDE24023DF8002A8185 /* UIViewController.swift */,
+				7DF82C1124034D10002919CE /* String.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -476,14 +479,15 @@
 				7DE3F421240018C8004D6932 /* SearchService.swift in Sources */,
 				7D711DC42400245F002A8185 /* MainViewModel.swift in Sources */,
 				7D711DDB24023155002A8185 /* FilterViewModel.swift in Sources */,
+				7DF82C1224034D10002919CE /* String.swift in Sources */,
 				7DE3F42824001A1A004D6932 /* DKCafe.swift in Sources */,
 				7D711DC224002458002A8185 /* MainViewController.swift in Sources */,
 				7D46F19B24027EF1006FC1C5 /* BaseViewModel.swift in Sources */,
+				7DF82C1524038938002919CE /* FilterType.swift in Sources */,
 				7D5B1B5F23FFF496001632EE /* SearchAPI.swift in Sources */,
 				7DDC57ED24024935000E49F6 /* SearchListViewModel.swift in Sources */,
 				7DDC57E9240242F1000E49F6 /* SearchListView.swift in Sources */,
 				7DE3F43024001C76004D6932 /* Date.swift in Sources */,
-				7DE3F42C24001A91004D6932 /* DKBlogDocument.swift in Sources */,
 				7D711DDF24023DF8002A8185 /* UIViewController.swift in Sources */,
 				7D46F19024026A2D006FC1C5 /* DetailViewModel.swift in Sources */,
 				7D46F18E24026A25006FC1C5 /* DetailViewController.swift in Sources */,
@@ -493,7 +497,7 @@
 				7D46F19724027D6B006FC1C5 /* URL.swift in Sources */,
 				7D711DD724022FFD002A8185 /* SearchViewModel.swift in Sources */,
 				7D711DD524022FF7002A8185 /* SearchView.swift in Sources */,
-				7DE3F43224001D3A004D6932 /* DKCafeDocument.swift in Sources */,
+				7DE3F43224001D3A004D6932 /* DKDocument.swift in Sources */,
 				7DDC57EB240248E4000E49F6 /* SearchListCellData.swift in Sources */,
 				7DE3F42A24001A37004D6932 /* DKMeta.swift in Sources */,
 				7DE3F426240019D0004D6932 /* DKBlog.swift in Sources */,

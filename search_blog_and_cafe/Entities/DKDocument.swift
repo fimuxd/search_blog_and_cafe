@@ -1,5 +1,5 @@
 //
-//  DKBlogDocument.swift
+//  DKDocument.swift
 //  search_blog_and_cafe
 //
 //  Created by Bo-Young PARK on 2020/02/21.
@@ -8,27 +8,30 @@
 
 import Foundation
 
-struct DKBlogDocument: Codable {
-    let title: String
-    let contents: String
+struct DKDocument: Codable {
+    let title: String?
+    let contents: String?
     let url: URL?
-    let blogName: String
+    let cafeName: String?
+    let blogName: String?
     let thumbnailURL: URL?
     let datetime: Date?
     
     enum CodingKeys: String, CodingKey {
         case title, contents, url, datetime
         case thumbnailURL = "thumbnail"
+        case cafeName = "cafename"
         case blogName = "blogname"
     }
     
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         
-        self.title = try values.decode(String.self, forKey: .title)
-        self.contents = try values.decode(String.self, forKey: .contents)
+        self.title = String.parse(values, key: .title)
+        self.contents = String.parse(values, key: .contents)
         self.url = URL.parse(values, key: .url)
-        self.blogName = try values.decode(String.self, forKey: .blogName)
+        self.cafeName = String.parse(values, key: .cafeName)
+        self.blogName = String.parse(values, key: .blogName)
         self.thumbnailURL = URL.parse(values, key: .thumbnailURL)
         self.datetime = Date.parse(values, key: .datetime)
     }

@@ -8,7 +8,12 @@
 
 import Foundation
 
-struct DKBlog: Codable {
+protocol DKData {
+    var meta: DKMeta { get }
+    var documents: [DKDocument] { get }
+}
+
+struct DKBlog: Codable, DKData {
     let meta: DKMeta
-    let documents: [DKBlogDocument]
+    let documents: [DKDocument]
 }
