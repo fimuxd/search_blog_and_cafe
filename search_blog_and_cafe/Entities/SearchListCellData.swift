@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SearchListCellData {
+struct SearchListCellData: Hashable {
     let thumbnailURL: URL?
     let type: FilterType
     let name: String?
