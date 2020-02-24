@@ -14,7 +14,6 @@ import SnapKit
 
 protocol MainViewBindable {
     typealias AlertAction = MainViewController.AlertAction
-    typealias FilterType = FilterView.FilterType
     
     var searchViewModel: SearchViewModel { get }
     var listViewModel: SearchListViewModel { get }
@@ -88,7 +87,7 @@ class MainViewController: UIViewController {
         
         typeListView.rx.itemSelected
             .map {
-                FilterView.FilterType(rawValue: $0.row) ?? .all
+                FilterType(rawValue: $0.row) ?? .all
             }
             .bind(to: viewModel.typeSelected)
             .disposed(by: disposeBag)

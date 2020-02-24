@@ -10,10 +10,10 @@ import Foundation
 
 struct SearchListCellData {
     let thumbnailURL: URL?
-    let type: FilterView.FilterType
-    let name: String
-    let title: String
-    let contents: String
+    let type: FilterType
+    let name: String?
+    let title: String?
+    let contents: String?
     let datetime: Date?
     let url: URL?
 }

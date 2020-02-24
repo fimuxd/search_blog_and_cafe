@@ -10,7 +10,6 @@ import RxSwift
 import RxCocoa
 
 protocol FilterViewBindable {
-    typealias FilterType = FilterView.FilterType
     var updatedType: Signal<FilterType> { get }
     
     var typeButtonTapped: PublishRelay<Void> { get }
@@ -18,23 +17,6 @@ protocol FilterViewBindable {
 }
 
 class FilterView: UITableViewHeaderFooterView {
-    enum FilterType: Int {
-        case all
-        case blog
-        case cafe
-        
-        var title: String {
-            switch self {
-            case .all:
-                return "All"
-            case .blog:
-                return "Blog"
-            case .cafe:
-                return "Cafe"
-            }
-        }
-    }
-    
     var disposeBag = DisposeBag()
     
     let typeButton = UIButton()
@@ -57,7 +39,6 @@ class FilterView: UITableViewHeaderFooterView {
         
         viewModel.updatedType
             .map { $0.title }
-            .debug("xxx")
             .emit(to: typeButton.rx.title())
             .disposed(by: disposeBag)
         
