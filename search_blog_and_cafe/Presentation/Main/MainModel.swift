@@ -23,6 +23,34 @@ struct MainModel {
         return service.searchCafe(query: query, page: page)
     }
     
+    func shouldMoreFetch(_ row: Int, cellData: [SearchListCellData]) -> Bool {
+        guard cellData.count > 24 else {
+            return false
+        }
+        
+        let lastCellCount = cellData.count
+        if lastCellCount - 1 == row {
+            return true
+        }
+        
+        return false
+    }
+    
+    func nextPage(_ data: DKData?, _ currentData: [SearchListCellData], for type: FilterType) -> Int {
+        guard let meta = data?.meta,
+            !meta.isEnd else {
+            return 1
+        }
+        
+        let totalCount = Double(meta.totalCount)
+        let currentCount = Double(currentData.filter { $0.type == type }.count)
+        let size: Double = 25
+        let totalPage = (totalCount/size).rounded(.up)
+        let nextPage = (totalPage - ((totalCount - currentCount)/size).rounded(.up)) + 1
+        
+        return Int(nextPage)
+    }
+    
     func blogResultToCellData(_ blog: DKBlog?) -> [SearchListCellData] {
         guard let blog = blog else {
             return []
