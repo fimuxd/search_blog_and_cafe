@@ -16,12 +16,14 @@ protocol MainViewBindable {
     typealias AlertAction = MainViewController.AlertAction
     
     var searchViewModel: SearchViewModel { get }
-    var listViewModel: SearchListViewModel { get }
+    var searchListViewModel: SearchListViewModel { get }
+    var historyListViewModel: HistoryListViewModel { get }
 
     var isTypeListHidden: Signal<Bool> { get }
     var typeListCellData: Driver<[FilterType]> { get }
     var presentAlert: Signal<Void> { get }
     var push: Driver<Pushable> { get }
+    var showHistoryList: Signal<Bool> { get }
 
 //    var viewWillAppear: PublishRelay<Void> { get }
     var alertActionTapped: PublishRelay<AlertAction> { get }
@@ -33,7 +35,8 @@ class MainViewController: UIViewController {
     
     let searchView = SearchView()
     let typeListView = UITableView()
-    let listView = SearchListView()
+    let searchListView = SearchListView()
+    let historyListView = HistoryListView()
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super .init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
@@ -49,7 +52,8 @@ class MainViewController: UIViewController {
         self.disposeBag = DisposeBag()
    
         searchView.bind(viewModel.searchViewModel)
-        listView.bind(viewModel.listViewModel)
+        searchListView.bind(viewModel.searchListViewModel)
+        historyListView.bind(viewModel.historyListViewModel)
         
         viewModel.isTypeListHidden
             .emit(to: typeListView.rx.isHidden)
@@ -80,10 +84,9 @@ class MainViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-//        self.rx.viewWillAppear
-//            .map { _ in Void() }
-//            .bind(to: viewModel.viewWillAppear)
-//            .disposed(by: disposeBag)
+        viewModel.showHistoryList
+            .emit(to: self.rx.showHistoryList)
+            .disposed(by: disposeBag)
         
         typeListView.rx.itemSelected
             .map {
@@ -102,20 +105,25 @@ class MainViewController: UIViewController {
     }
     
     private func layout() {
-        [searchView, listView, typeListView].forEach { view.addSubview($0) }
+        [searchView, historyListView, searchListView, typeListView].forEach { view.addSubview($0) }
         
         searchView.snp.makeConstraints {
             $0.top.equalTo(topLayoutGuide.snp.bottom)
             $0.leading.trailing.equalToSuperview()
         }
         
-        listView.snp.makeConstraints {
+        historyListView.snp.makeConstraints {
+            $0.top.equalTo(searchView.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        searchListView.snp.makeConstraints {
             $0.top.equalTo(searchView.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
         typeListView.snp.makeConstraints {
-            $0.top.equalTo(listView).offset(50)
+            $0.top.equalTo(searchListView).offset(50)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(140)
         }
@@ -144,6 +152,15 @@ extension MainViewController {
             case .cancel:
                 return .cancel
             }
+        }
+    }
+}
+
+extension Reactive where Base: MainViewController {
+    var showHistoryList: Binder<Bool> {
+        return Binder(base) { base, showHistoryList in
+            base.searchListView.isHidden = showHistoryList
+            base.historyListView.isHidden = !showHistoryList
         }
     }
 }

@@ -14,14 +14,15 @@ struct MainViewModel: MainViewBindable {
     let disposeBag = DisposeBag()
     
     let searchViewModel = SearchViewModel()
-    let listViewModel = SearchListViewModel()
+    let searchListViewModel = SearchListViewModel()
+    let historyListViewModel = HistoryListViewModel()
     
     let typeListCellData: Driver<[FilterType]>
     let presentAlert: Signal<Void>
     let isTypeListHidden: Signal<Bool>
     let push: Driver<Pushable>
+    let showHistoryList: Signal<Bool>
     
-//    let viewWillAppear = PublishRelay<Void>()
     let typeSelected = PublishRelay<FilterType>()
     let alertActionTapped = PublishRelay<AlertAction>()
     
@@ -30,41 +31,59 @@ struct MainViewModel: MainViewBindable {
     private let cellData = PublishSubject<[SearchListCellData]>()
     
     init(model: MainModel = MainModel()) {
+        //MARK: ViewModel -> View
         typeListCellData = Driver.of([FilterType.all, FilterType.blog, FilterType.cafe])
         
-        presentAlert = listViewModel.headerViewModel.sortButtonTapped
+        presentAlert = searchListViewModel.headerViewModel.sortButtonTapped
             .asSignal(onErrorSignalWith: .empty())
         
         isTypeListHidden = Observable
             .merge(
-                listViewModel.headerViewModel.typeButtonTapped.map { false },
+                searchListViewModel.headerViewModel.typeButtonTapped.map { false },
                 typeSelected.map { _ in true }
             )
             .startWith(true)
             .asSignal(onErrorJustReturn: true)
         
-        push = listViewModel.itemSelected
+        push = searchListViewModel.itemSelected
             .withLatestFrom(cellData) { $1[$0] }
             .map { DetailViewModel(data: $0) }
             .map { PushableView.detailView($0) }
             .asDriver(onErrorDriveWith: .empty())
 
-        //MARK: ViewModel -> View
         typeSelected
-            .bind(to: listViewModel.headerViewModel.shouldUpdateType)
+            .bind(to: searchListViewModel.headerViewModel.shouldUpdateType)
             .disposed(by: disposeBag)
+        
+        showHistoryList = Observable
+            .merge(
+                searchViewModel.textDidBeginEditing.map { true },
+                searchViewModel.searchButtonTapped.map { false },
+                historyListViewModel.itemSelected.map { _ in false }
+            )
+            .asSignal(onErrorJustReturn: true)
+        
+        historyListViewModel.selectedHistory
+            .bind(to: searchViewModel.shouldUpdateQueryText)
+            .disposed(by: disposeBag)
+        
+        //MARK: BlogData
+        let queryText = Observable
+            .merge(
+                searchViewModel.shouldLoadResult,
+                historyListViewModel.selectedHistory
+            )
         
         let searchCondition = Observable
             .combineLatest(
-                searchViewModel.shouldLoadResult,
-                listViewModel.headerViewModel.currentType
+                queryText,
+                searchListViewModel.headerViewModel.currentType
             ) { (result: $0, type: $1) }
         
-        //MARK: BlogData
         let blogResult = searchCondition
             .filter { !($0.type == .cafe) }
             .map { $0.result }
-            .flatMapLatest { model.searchBlog(query: $0!) }
+            .flatMapLatest { model.searchBlog(query: $0) }
             .share()
                 
         let currentBlogData = Observable
@@ -72,7 +91,7 @@ struct MainViewModel: MainViewBindable {
         
         let shouldMoreBlogData = Observable
             .combineLatest(
-                listViewModel.willDisplayCell,
+                searchListViewModel.willDisplayCell,
                 cellData
             )
             .map(model.shouldMoreFetch)
@@ -81,7 +100,7 @@ struct MainViewModel: MainViewBindable {
             .filter { $0 }
             .withLatestFrom(currentBlogData) { ($1.0, $1.1, .blog) }
             .map(model.nextPage)
-            .withLatestFrom(searchViewModel.shouldLoadResult) { (query: $1 ?? "", page: $0) }
+            .withLatestFrom(queryText) { (query: $1, page: $0) }
             .flatMapLatest(model.searchBlog)
             .share()
 
@@ -111,7 +130,7 @@ struct MainViewModel: MainViewBindable {
         let cafeResult = searchCondition
             .filter { !($0.type == .blog) }
             .map { $0.result }
-            .flatMapLatest { model.searchCafe(query: $0!) }
+            .flatMapLatest { model.searchCafe(query: $0) }
             .share()
         
         let currentCafeData = Observable
@@ -119,7 +138,7 @@ struct MainViewModel: MainViewBindable {
         
         let shouldMoreCafeData = Observable
             .combineLatest(
-                listViewModel.willDisplayCell,
+                searchListViewModel.willDisplayCell,
                 cellData
             )
             .map(model.shouldMoreFetch)
@@ -128,7 +147,7 @@ struct MainViewModel: MainViewBindable {
             .filter { $0 }
             .withLatestFrom(currentCafeData) { ($1.0, $1.1, .cafe) }
             .map(model.nextPage)
-            .withLatestFrom(searchViewModel.shouldLoadResult) { (query: $1 ?? "", page: $0) }
+            .withLatestFrom(queryText) { (query: $1, page: $0) }
             .flatMapLatest(model.searchCafe)
             .share()
         
@@ -171,41 +190,25 @@ struct MainViewModel: MainViewBindable {
                 cafeValue.map(model.cafeResultToCellData)
             )
             .withLatestFrom(searchCondition) { (data: $0, type: $1.type) }
-            .scan([SearchListCellData]()){
-                switch $1.type {
-                case .all:
-                    return $0 + $1.data
-                case .blog:
-                    return ($0 + $1.data).filter { $0.type == .blog }
-                case .cafe:
-                    return ($0 + $1.data).filter { $0.type == .cafe }
-                }
-            }
+            .scan([SearchListCellData](), accumulator: model.combineCellData)
             
         let typeFiltering = Observable
             .merge(blogFiltered, cafeFiltered)
         
-        Observable
+        let updatedCellData = Observable
             .merge(paging, typeFiltering)
-            .bind(to: cellData)
-            .disposed(by: disposeBag)
         
         Observable
             .combineLatest(
                 alertActionTapped.startWith(.title),
-                cellData
-            ) { (sort: $0, cell: $1) }
-            .map { data -> [SearchListCellData] in
-                switch data.sort {
-                case .title:
-                    return data.cell.sorted { $0.title ?? "" < $1.title ?? "" }
-                case .datetime:
-                    return data.cell.sorted { $0.datetime ?? Date() < $1.datetime ?? Date() }
-                default:
-                    return data.cell
-                }
-            }
-            .bind(to: listViewModel.data)
+                updatedCellData
+            )
+            .map(model.sortCellData)
+            .bind(to: cellData)
+            .disposed(by: disposeBag)
+            
+        cellData
+            .bind(to: searchListViewModel.data)
             .disposed(by: disposeBag)
     }
 }

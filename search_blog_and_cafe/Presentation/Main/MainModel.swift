@@ -64,4 +64,28 @@ struct MainModel {
         }
         return cafe.documents.map { SearchListCellData(thumbnailURL: $0.thumbnailURL, type: .cafe, name: $0.cafeName, title: $0.title, contents: $0.contents, datetime: $0.datetime, url: $0.url) }
     }
+    
+    func combineCellData(_ prev: [SearchListCellData], _ input: (data: [SearchListCellData], type: FilterType)) -> [SearchListCellData] {
+        switch input.type {
+        case .all:
+            return prev + input.data
+        case .blog:
+            return (prev + input.data).filter { $0.type == .blog }
+        case .cafe:
+            return (prev + input.data).filter { $0.type == .cafe }
+        }
+    }
+    
+    typealias AlertAction = MainViewModel.AlertAction
+    func sortCellData(_ type: AlertAction, _ cellData: [SearchListCellData]) -> [SearchListCellData] {
+        let data = Array(Set(cellData))
+        switch type {
+        case .title:
+            return data.sorted { $0.title  ?? "" < $1.title ?? "" }
+        case .datetime:
+            return data.sorted { $0.datetime ?? Date() < $1.datetime ?? Date() }
+        case .cancel:
+            return data
+        }
+    }
 }
