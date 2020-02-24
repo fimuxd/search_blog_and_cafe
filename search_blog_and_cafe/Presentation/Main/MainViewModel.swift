@@ -155,29 +155,41 @@ struct MainViewModel: MainViewBindable {
                 return error.message
             }
         
-        let initialResult = Observable
-            .merge(blogValue, cafeValue)
-            .scan([]) { $0 + $1 }
+        let blogFiltered = typeSelected
+            .filter { $0 == .blog }
+            .withLatestFrom(blogValue)
+            .map(model.blogResultToCellData)
         
-        let typeFilterResult = typeSelected
-            .withLatestFrom(resultData) { type, data in
-                data.filter { $0.type == type }
+        let cafeFiltered = typeSelected
+            .filter { $0 == .cafe }
+            .withLatestFrom(cafeValue)
+            .map(model.cafeResultToCellData)
+        
+        //MARK: CellData
+        let paging = Observable
+            .merge(
+                blogValue.map(model.blogResultToCellData),
+                cafeValue.map(model.cafeResultToCellData)
+            )
+            .withLatestFrom(searchCondition) { (data: $0, type: $1.type) }
+            .scan([SearchListCellData]()){
+                switch $1.type {
+                case .all:
+                    return $0 + $1.data
+                case .blog:
+                    return ($0 + $1.data).filter { $0.type == .blog }
+                case .cafe:
+                    return ($0 + $1.data).filter { $0.type == .cafe }
+                }
             }
+            
+        let typeFiltering = Observable
+            .merge(blogFiltered, cafeFiltered)
         
         Observable
-            .merge(
-                initialResult,
-                typeFilterResult
-            )
-            .debug("xxx")
-            .bind(to: resultData)
-        //            .disposed(by: disposeBag)
-        
-        resultData
-            .map { $0.sorted { $0.title < $1.title } }
-            .bind(to: listViewModel.data)
-        //            .disposed(by: disposeBag)
-        
+            .merge(paging, typeFiltering)
+            .bind(to: cellData)
+            .disposed(by: disposeBag)
         
         // alertActionTapped = 네트워크 업데이트 시 사용
     }
