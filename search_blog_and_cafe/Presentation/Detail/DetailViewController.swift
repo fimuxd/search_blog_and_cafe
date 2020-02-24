@@ -114,11 +114,29 @@ class DetailViewController: UIViewController {
 extension Reactive where Base: DetailViewController {
     var layoutComponents: Binder<SearchListCellData> {
         return Binder(base) { base, data in
+            base.title = data.type.title
             base.thumbnailImageView.kf.setImage(with: data.thumbnailURL)
             base.nameLabel.text = data.name
             base.titleLabel.text = data.title
             base.contentLabel.text = data.contents
-            base.datetimeLabel.text = data.datetime?.description
+            
+            var datetime: String {
+                let calendar = Calendar(identifier: .gregorian)
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy년 MM월 dd일 a hh시 mm분"
+                dateFormatter.locale = Locale(identifier: "ko_kr")
+                let contentDate = data.datetime ?? Date()
+                
+                if calendar.isDateInToday(contentDate) {
+                    return "오늘"
+                } else if calendar.isDateInYesterday(contentDate) {
+                    return "어제"
+                } else {
+                    return dateFormatter.string(from: contentDate)
+                }
+            }
+            
+            base.datetimeLabel.text = datetime
             base.urlLabel.text = data.thumbnailURL?.absoluteString
         }
     }

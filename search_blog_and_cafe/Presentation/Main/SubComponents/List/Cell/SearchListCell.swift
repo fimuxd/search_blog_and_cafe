@@ -32,7 +32,23 @@ class SearchListCell: UITableViewCell {
         typeLabel.text = data.type.title
         nameLabel.text = data.name
         titleLabel.text = data.title
-        datetimeLabel.text = data.datetime?.description
+        
+        var datetime: String {
+            let calendar = Calendar(identifier: .gregorian)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+            let contentDate = data.datetime ?? Date()
+            
+            if calendar.isDateInToday(contentDate) {
+                return "오늘"
+            } else if calendar.isDateInYesterday(contentDate) {
+                return "어제"
+            } else {
+                return dateFormatter.string(from: contentDate)
+            }
+        }
+        
+        datetimeLabel.text = datetime
     }
     
     private func attribute() {
