@@ -12,6 +12,8 @@ import RxCocoa
 protocol SearchViewBindable {
     var queryText: PublishRelay<String?> { get }
     var searchButtonTapped: PublishRelay<Void> { get }
+    var textDidBeginEditing: PublishRelay<Void> { get }
+    var updateQueryText: Signal<String> { get }
 }
 
 class SearchView: UISearchBar {
@@ -42,6 +44,17 @@ class SearchView: UISearchBar {
                 searchButton.rx.tap.asObservable()
             )
             .bind(to: viewModel.searchButtonTapped)
+            .disposed(by: disposeBag)
+        
+        self.rx.textDidBeginEditing
+            .bind(to: viewModel.textDidBeginEditing)
+            .disposed(by: disposeBag)
+        
+        viewModel.updateQueryText
+            .do(onNext: { [weak self] _ in
+                self?.endEditing(true)
+            })
+            .emit(to: self.searchTextField.rx.text)
             .disposed(by: disposeBag)
     }
     

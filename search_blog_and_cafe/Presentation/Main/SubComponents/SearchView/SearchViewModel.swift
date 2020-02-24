@@ -12,13 +12,22 @@ import RxCocoa
 struct SearchViewModel: SearchViewBindable {
     let queryText = PublishRelay<String?>()
     let searchButtonTapped = PublishRelay<Void>()
+    let textDidBeginEditing = PublishRelay<Void>()
     
-    let shouldLoadResult: Observable<String?>
+    let updateQueryText: Signal<String>
+    let shouldUpdateQueryText = PublishSubject<String>()
+    let shouldLoadResult: Observable<String>
     
-    init() {
+    init(model: SearchModel = SearchModel()) {
+        updateQueryText = shouldUpdateQueryText
+            .asSignal(onErrorSignalWith: .empty())
+        
         shouldLoadResult = searchButtonTapped
-            .withLatestFrom(queryText)
-            .filter { !($0?.isEmpty ?? true) }
+            .withLatestFrom(queryText) { $1 ?? "" }
+            .filter { !$0.isEmpty }
             .distinctUntilChanged()
+            .do(onNext: { text in
+                model.setDataToUserDefault(text)
+            })
     }
 }
