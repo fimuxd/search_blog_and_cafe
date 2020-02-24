@@ -191,6 +191,22 @@ struct MainViewModel: MainViewBindable {
             .bind(to: cellData)
             .disposed(by: disposeBag)
         
-        // alertActionTapped = 네트워크 업데이트 시 사용
+        Observable
+            .combineLatest(
+                alertActionTapped.startWith(.title),
+                cellData
+            ) { (sort: $0, cell: $1) }
+            .map { data -> [SearchListCellData] in
+                switch data.sort {
+                case .title:
+                    return data.cell.sorted { $0.title ?? "" < $1.title ?? "" }
+                case .datetime:
+                    return data.cell.sorted { $0.datetime ?? Date() < $1.datetime ?? Date() }
+                default:
+                    return data.cell
+                }
+            }
+            .bind(to: listViewModel.data)
+            .disposed(by: disposeBag)
     }
 }
