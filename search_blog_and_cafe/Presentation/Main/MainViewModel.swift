@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 struct MainViewModel: MainViewBindable {
-    var disposeBag = DisposeBag()
+    let disposeBag = DisposeBag()
     
     let searchViewModel = SearchViewModel()
     let listViewModel = SearchListViewModel()
@@ -43,7 +43,6 @@ struct MainViewModel: MainViewBindable {
             .startWith(true)
             .asSignal(onErrorJustReturn: true)
         
-        
         push = listViewModel.itemSelected
             .withLatestFrom(cellData) { $1[$0] }
             .map { DetailViewModel(data: $0) }
@@ -53,7 +52,7 @@ struct MainViewModel: MainViewBindable {
         //MARK: ViewModel -> View
         typeSelected
             .bind(to: listViewModel.headerViewModel.shouldUpdateType)
-//            .disposed(by: disposeBag)
+            .disposed(by: disposeBag)
         
         let searchCondition = Observable
             .combineLatest(

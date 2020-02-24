@@ -18,7 +18,6 @@ class BaseViewController: UINavigationController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         viewControllers = [mainViewController]
     }
     

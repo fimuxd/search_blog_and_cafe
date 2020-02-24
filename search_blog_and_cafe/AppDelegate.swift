@@ -11,11 +11,11 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    let rootViewModel = BaseViewModel()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         self.window = UIWindow()
         let rootViewController = BaseViewController()
-        let rootViewModel = BaseViewModel()
         rootViewController.bind(rootViewModel)
         
         window?.rootViewController = rootViewController
