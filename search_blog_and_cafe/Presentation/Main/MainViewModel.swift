@@ -79,6 +79,11 @@ struct MainViewModel: MainViewBindable {
                 searchViewModel.shouldLoadResult,
                 historyListViewModel.selectedHistory
             )
+            .do(onNext: { [weak cellData, weak blogData, weak cafeData] _ in
+                cellData?.onNext([])
+                blogData?.onNext(nil)
+                cafeData?.onNext(nil)
+            })
         
         let searchCondition = Observable
             .combineLatest(
@@ -204,10 +209,19 @@ struct MainViewModel: MainViewBindable {
         let updatedCellData = Observable
             .merge(paging, typeFiltering)
         
+        let sortedType = alertActionTapped
+            .filter { $0 != .cancel }
+            .startWith(.title)
+        
+        let urlTappedIDs = UserDefaults.standard.rx.observe([Int].self, "url_tapped_id")
+            .startWith([])
+            .map { $0 ?? [] }
+        
         Observable
             .combineLatest(
-                alertActionTapped.startWith(.title),
-                updatedCellData
+                sortedType,
+                updatedCellData,
+                urlTappedIDs
             )
             .map(model.sortCellData)
             .bind(to: cellData)

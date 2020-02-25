@@ -55,14 +55,14 @@ struct MainModel {
         guard let blog = blog else {
             return []
         }
-        return blog.documents.map { SearchListCellData(thumbnailURL: $0.thumbnailURL, type: .blog, name: $0.blogName, title: $0.title, contents: $0.contents, datetime: $0.datetime, url: $0.url) }
+        return blog.documents.map { SearchListCellData(thumbnailURL: $0.thumbnailURL, type: .blog, name: $0.blogName, title: $0.title, contents: $0.contents, datetime: $0.datetime, url: $0.url, didURLLinkTapped: false) }
     }
     
     func cafeResultToCellData(_ cafe: DKCafe?) -> [SearchListCellData] {
         guard let cafe = cafe else {
             return []
         }
-        return cafe.documents.map { SearchListCellData(thumbnailURL: $0.thumbnailURL, type: .cafe, name: $0.cafeName, title: $0.title, contents: $0.contents, datetime: $0.datetime, url: $0.url) }
+        return cafe.documents.map { SearchListCellData(thumbnailURL: $0.thumbnailURL, type: .cafe, name: $0.cafeName, title: $0.title, contents: $0.contents, datetime: $0.datetime, url: $0.url, didURLLinkTapped: false) }
     }
     
     func combineCellData(_ prev: [SearchListCellData], _ input: (data: [SearchListCellData], type: FilterType)) -> [SearchListCellData] {
@@ -77,8 +77,9 @@ struct MainModel {
     }
     
     typealias AlertAction = MainViewModel.AlertAction
-    func sortCellData(_ type: AlertAction, _ cellData: [SearchListCellData]) -> [SearchListCellData] {
-        let data = Array(Set(cellData))
+    func sortCellData(_ type: AlertAction, _ cellData: [SearchListCellData], ids: [Int]) -> [SearchListCellData] {
+        let updatedCellData = updateCellStatus(cellData, ids)
+        let data = Array(Set(updatedCellData))
         switch type {
         case .title:
             return data.sorted { $0.title  ?? "" < $1.title ?? "" }
@@ -87,5 +88,19 @@ struct MainModel {
         case .cancel:
             return data
         }
+    }
+    
+    func updateCellStatus(_ cellData: [SearchListCellData], _ ids: [Int]) -> [SearchListCellData] {
+        var result = cellData
+        
+        let index = result.enumerated().filter {
+            ids.contains($0.element.hashValue)
+        }.map { $0.offset }
+        
+        index.forEach {
+            result[$0].didURLLinkTapped = true
+        }
+        
+        return result
     }
 }

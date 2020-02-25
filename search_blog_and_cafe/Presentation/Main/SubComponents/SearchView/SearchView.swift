@@ -14,6 +14,7 @@ protocol SearchViewBindable {
     var searchButtonTapped: PublishRelay<Void> { get }
     var textDidBeginEditing: PublishRelay<Void> { get }
     var updateQueryText: Signal<String> { get }
+    var endEditing: Signal<Void> { get }
 }
 
 class SearchView: UISearchBar {
@@ -51,10 +52,11 @@ class SearchView: UISearchBar {
             .disposed(by: disposeBag)
         
         viewModel.updateQueryText
-            .do(onNext: { [weak self] _ in
-                self?.endEditing(true)
-            })
             .emit(to: self.searchTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        viewModel.endEditing
+            .emit(to: self.rx.endEditing)
             .disposed(by: disposeBag)
     }
     
@@ -79,3 +81,10 @@ class SearchView: UISearchBar {
     }
 }
 
+extension Reactive where Base: SearchView {
+    var endEditing: Binder<Void> {
+        return Binder(base) { base, _ in
+            base.endEditing(true)
+        }
+    }
+}

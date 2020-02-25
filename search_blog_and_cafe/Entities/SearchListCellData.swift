@@ -16,4 +16,5 @@ struct SearchListCellData: Hashable {
     let contents: String?
     let datetime: Date?
     let url: URL?
+    var didURLLinkTapped: Bool = false
 }

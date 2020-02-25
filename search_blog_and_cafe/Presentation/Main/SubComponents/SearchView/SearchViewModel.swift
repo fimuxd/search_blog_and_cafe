@@ -17,6 +17,9 @@ struct SearchViewModel: SearchViewBindable {
     let updateQueryText: Signal<String>
     let shouldUpdateQueryText = PublishSubject<String>()
     let shouldLoadResult: Observable<String>
+    let endEditing: Signal<Void>
+    
+    let shouldEndEditing = PublishSubject<Void>()
     
     init(model: SearchModel = SearchModel()) {
         updateQueryText = shouldUpdateQueryText
@@ -29,5 +32,13 @@ struct SearchViewModel: SearchViewBindable {
             .do(onNext: { text in
                 model.setDataToUserDefault(text)
             })
+        
+        endEditing = Observable
+            .merge(
+                searchButtonTapped.asObservable(),
+                shouldUpdateQueryText.map { _ in Void() },
+                shouldEndEditing
+            )
+            .asSignal(onErrorSignalWith: .empty())
     }
 }
