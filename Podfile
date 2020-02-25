@@ -13,6 +13,7 @@ target 'search_blog_and_cafe' do
 
   # UI
   pod 'SnapKit'
+  pod 'Kingfisher'
 
   target 'search_blog_and_cafeTests' do
     inherit! :search_paths

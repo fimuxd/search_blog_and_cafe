@@ -7,21 +7,23 @@
 //
 
 import UIKit
-import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    let rootViewModel = BaseViewModel()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        let rootViewController = SearchListViewController()
-        let rootViewModel = SearchListViewModel()
+        self.window = UIWindow()
+        let rootViewController = BaseViewController()
         rootViewController.bind(rootViewModel)
         
         window?.rootViewController = rootViewController
         window?.makeKeyAndVisible()
-        
         return true
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        UserDefaults.standard.removeObject(forKey: "url_tapped_id")
     }
 }
