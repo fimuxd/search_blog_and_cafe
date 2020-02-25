@@ -16,7 +16,6 @@ struct HistoryListModel {
     }
     
     func loadHistoryList() -> Observable<[String]> {
-        let historyList = userDefaults.array(forKey: "search_history") as? [String]
         return userDefaults.rx.observe([String].self, "search_history").map { $0 ?? [] }
     }
 }
