@@ -14,13 +14,14 @@ protocol HistoryListViewBindable {
     var itemSelected: PublishRelay<Int> { get }
 }
 
-class HistoryListView: UITableView {
+class HistoryListView: UIView {
     var disposeBag = DisposeBag()
+    let listView = UITableView()
     
-    override init(frame: CGRect, style: UITableView.Style) {
-        super.init(frame: frame, style: style)
-        
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         attribute()
+        layout()
     }
     
     required init?(coder: NSCoder) {
@@ -31,7 +32,7 @@ class HistoryListView: UITableView {
         self.disposeBag = DisposeBag()
      
         viewModel.historyListCellData
-            .drive(self.rx.items) { tv, row, text in
+            .drive(listView.rx.items) { tv, row, text in
                 let index = IndexPath(row: row, section: 0)
                 let cell = tv.dequeueReusableCell(withIdentifier: "HistoryListCell", for: index)
                 cell.textLabel?.text = text
@@ -39,15 +40,29 @@ class HistoryListView: UITableView {
             }
             .disposed(by: disposeBag)
         
-        self.rx.itemSelected
+        listView.rx.itemSelected
             .map { $0.row }
             .bind(to: viewModel.itemSelected)
             .disposed(by: disposeBag)
     }
     
     private func attribute() {
-        self.backgroundColor = .white
-        self.register(UITableViewCell.self, forCellReuseIdentifier: "HistoryListCell")
-        self.separatorStyle = .singleLine
+        listView.backgroundColor = .white
+        listView.register(UITableViewCell.self, forCellReuseIdentifier: "HistoryListCell")
+        listView.separatorStyle = .singleLine
+        listView.layer.masksToBounds = true
+        
+        self.layer.shadowColor = UIColor.darkGray.cgColor
+        self.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
+        self.layer.shadowOpacity = 1.0
+        self.layer.shadowRadius = 2
+    }
+    
+    private func layout() {
+        addSubview(listView)
+        
+        listView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }

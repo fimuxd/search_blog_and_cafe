@@ -15,6 +15,7 @@ struct SearchListViewModel: SearchListViewBindable {
     let searhListCellData: Driver<[SearchListCellData]>
     let itemSelected = PublishRelay<Int>()
     let willDisplayCell = PublishRelay<Int>()
+    let didScroll = PublishRelay<Void>()
     
     let data = PublishSubject<[SearchListCellData]>()
     

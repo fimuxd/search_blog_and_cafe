@@ -14,6 +14,7 @@ protocol SearchListViewBindable {
     var searhListCellData: Driver<[SearchListCellData]> { get }
     var itemSelected: PublishRelay<Int> { get }
     var willDisplayCell: PublishRelay<Int> { get }
+    var didScroll: PublishRelay<Void> { get }
 }
 
 class SearchListView: UITableView {
@@ -53,6 +54,10 @@ class SearchListView: UITableView {
         self.rx.willDisplayCell
             .map { $0.indexPath.row }
             .bind(to: viewModel.willDisplayCell)
+            .disposed(by: disposeBag)
+        
+        self.rx.didScroll
+            .bind(to: viewModel.didScroll)
             .disposed(by: disposeBag)
     }
     

@@ -28,6 +28,7 @@ class SearchListCell: UITableViewCell {
     }
     
     func setData(_ data: SearchListCellData) {
+        contentView.backgroundColor = data.didURLLinkTapped ? .gray : .white
         thumbnailImageView.kf.setImage(with: data.thumbnailURL)
         typeLabel.text = data.type.title
         nameLabel.text = data.name
