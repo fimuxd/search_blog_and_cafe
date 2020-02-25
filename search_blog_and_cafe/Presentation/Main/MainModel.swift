@@ -82,10 +82,10 @@ struct MainModel {
         let data = Array(Set(updatedCellData))
         switch type {
         case .title:
-            return data.sorted { $0.title  ?? "" < $1.title ?? "" }
+            return data.sorted { $0.title ?? "" < $1.title ?? "" }
         case .datetime:
             return data.sorted { $0.datetime ?? Date() < $1.datetime ?? Date() }
-        case .cancel:
+        case .cancel, .confirm:
             return data
         }
     }

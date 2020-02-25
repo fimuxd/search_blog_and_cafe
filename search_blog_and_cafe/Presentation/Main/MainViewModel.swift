@@ -18,7 +18,7 @@ struct MainViewModel: MainViewBindable {
     let historyListViewModel = HistoryListViewModel()
     let typeListViewModel = TypeListViewModel()
     
-    let presentAlert: Signal<Void>
+    let presentAlert: Signal<Alert>
     let push: Driver<Pushable>
     let isTypeListHidden: Signal<Bool>
     let isHistoryListHidden: Signal<Bool>
@@ -30,36 +30,6 @@ struct MainViewModel: MainViewBindable {
     private let cellData = PublishSubject<[SearchListCellData]>()
     
     init(model: MainModel = MainModel()) {
-        //MARK: ViewModel -> View
-        presentAlert = searchListViewModel.headerViewModel.sortButtonTapped
-            .asSignal(onErrorSignalWith: .empty())
-        
-        push = searchListViewModel.itemSelected
-            .withLatestFrom(cellData) { $1[$0] }
-            .map { DetailViewModel(data: $0) }
-            .map { PushableView.detailView($0) }
-            .asDriver(onErrorDriveWith: .empty())
-        
-        isTypeListHidden = Observable
-            .merge(
-                searchViewModel.textDidBeginEditing.map { true },
-                searchListViewModel.headerViewModel.sortButtonTapped.map { true },
-                searchListViewModel.headerViewModel.typeButtonTapped.map { false },
-                searchListViewModel.didScroll.map { true },
-                typeListViewModel.typeSelected.map { _ in true }
-            )
-            .startWith(true)
-            .asSignal(onErrorJustReturn: true)
-        
-        isHistoryListHidden = Observable
-            .merge(
-                searchViewModel.textDidBeginEditing.map { false },
-                searchViewModel.searchButtonTapped.map { true },
-                searchListViewModel.didScroll.map { true },
-                historyListViewModel.itemSelected.map { _ in true }
-            )
-            .asSignal(onErrorJustReturn: false)
-
         //MARK: ViewModel -> ViewModel
         searchListViewModel.didScroll
             .bind(to: searchViewModel.shouldEndEditing)
@@ -123,6 +93,7 @@ struct MainViewModel: MainViewBindable {
                 }
                 return value
             }
+            .filter { $0 != nil }
         
         blogValue
             .bind(to: blogData)
@@ -136,6 +107,7 @@ struct MainViewModel: MainViewBindable {
                 }
                 return error.message
             }
+            .filter { $0 != nil }
         
         //MARK: CafeData
         let cafeResult = searchCondition
@@ -170,6 +142,7 @@ struct MainViewModel: MainViewBindable {
                 }
                 return value
             }
+            .filter { $0 != nil }
         
         cafeValue
             .bind(to: cafeData)
@@ -183,6 +156,7 @@ struct MainViewModel: MainViewBindable {
                 }
                 return error.message
             }
+            .filter { $0 != nil }
         
         let blogFiltered = typeListViewModel.typeSelected
             .filter { $0 == .blog }
@@ -210,7 +184,14 @@ struct MainViewModel: MainViewBindable {
             .merge(paging, typeFiltering)
         
         let sortedType = alertActionTapped
-            .filter { $0 != .cancel }
+            .filter {
+                switch $0 {
+                case .title, .datetime:
+                    return true
+                default:
+                    return false
+                }
+            }
             .startWith(.title)
         
         let urlTappedIDs = UserDefaults.standard.rx.observe([Int].self, "url_tapped_id")
@@ -230,5 +211,63 @@ struct MainViewModel: MainViewBindable {
         cellData
             .bind(to: searchListViewModel.data)
             .disposed(by: disposeBag)
+        
+        //MARK: ViewModel -> View
+        let alertSheetForSorting = searchListViewModel.headerViewModel.sortButtonTapped
+            .map { _ -> Alert in
+                return (title: nil, message: nil, actions: [.title, .datetime, .cancel], style: .actionSheet)
+            }
+        
+        let alertForErrorMessage = Observable
+            .merge(
+                blogError,
+                cafeError
+            )
+            .do(onNext: { message in
+                print("error: \(message ?? "")")
+            })
+            .map { _ -> Alert in
+                return (
+                    title: "앗!",
+                    message: "예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+                    actions: [.confirm],
+                    style: .alert
+                )
+            }
+        
+        presentAlert = Observable
+            .merge(
+                alertSheetForSorting,
+                alertForErrorMessage
+            )
+            .asSignal(onErrorSignalWith: .empty())
+        
+        push = searchListViewModel.itemSelected
+            .withLatestFrom(cellData) { $1[$0] }
+            .map { DetailViewModel(data: $0) }
+            .map { PushableView.detailView($0) }
+            .asDriver(onErrorDriveWith: .empty())
+        
+        isTypeListHidden = Observable
+            .merge(
+                searchViewModel.textDidBeginEditing.map { true },
+                searchListViewModel.headerViewModel.sortButtonTapped.map { true },
+                searchListViewModel.headerViewModel.typeButtonTapped.map { false },
+                searchListViewModel.didScroll.map { true },
+                typeListViewModel.typeSelected.map { _ in true }
+            )
+            .startWith(true)
+            .asSignal(onErrorJustReturn: true)
+        
+        isHistoryListHidden = Observable
+            .merge(
+                searchViewModel.textDidBeginEditing.map { false },
+                searchViewModel.searchButtonTapped.map { true },
+                searchListViewModel.didScroll.map { true },
+                historyListViewModel.itemSelected.map { _ in true }
+            )
+            .startWith(true)
+            .asSignal(onErrorJustReturn: false)
+
     }
 }

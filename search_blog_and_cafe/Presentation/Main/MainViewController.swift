@@ -13,6 +13,7 @@ import RxAppState
 import SnapKit
 
 protocol MainViewBindable {
+    typealias Alert = MainViewController.Alert
     typealias AlertAction = MainViewController.AlertAction
     
     var searchViewModel: SearchViewModel { get }
@@ -21,7 +22,7 @@ protocol MainViewBindable {
     var typeListViewModel: TypeListViewModel { get }
 
     var isTypeListHidden: Signal<Bool> { get }
-    var presentAlert: Signal<Void> { get }
+    var presentAlert: Signal<Alert> { get }
     var push: Driver<Pushable> { get }
     var isHistoryListHidden: Signal<Bool> { get }
 
@@ -59,9 +60,9 @@ class MainViewController: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel.presentAlert
-            .flatMapLatest { _ in
-                let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-                return self.presentAlertController(alertController, actions: [.title, .datetime, .cancel])
+            .flatMapLatest { alert in
+                let alertController = UIAlertController(title: alert.title, message: alert.message, preferredStyle: alert.style)
+                return self.presentAlertController(alertController, actions: alert.actions)
             }
             .emit(to: viewModel.alertActionTapped)
             .disposed(by: disposeBag)
@@ -74,7 +75,7 @@ class MainViewController: UIViewController {
             .disposed(by: disposeBag)
         
         viewModel.isHistoryListHidden
-            .emit(to: self.rx.isHistoryListHidden)
+            .emit(to: historyListView.rx.isHidden)
             .disposed(by: disposeBag)
     }
     
@@ -112,8 +113,10 @@ class MainViewController: UIViewController {
 }
 
 extension MainViewController {
+    typealias Alert = (title: String?, message: String?, actions: [AlertAction], style: UIAlertController.Style)
     enum AlertAction: AlertActionConvertible {
         case title, datetime, cancel
+        case confirm
         
         var title: String {
             switch self {
@@ -123,6 +126,8 @@ extension MainViewController {
                 return "Datetime"
             case .cancel:
                 return "취소"
+            case .confirm:
+                return "확인"
             }
         }
         
@@ -130,18 +135,9 @@ extension MainViewController {
             switch self {
             case .title, .datetime:
                 return .default
-            case .cancel:
+            case .cancel, .confirm:
                 return .cancel
             }
-        }
-    }
-}
-
-extension Reactive where Base: MainViewController {
-    var isHistoryListHidden: Binder<Bool> {
-        return Binder(base) { base, hideHistoryList in
-//            base.searchListView.isHidden = !hideHistoryList
-            base.historyListView.isHidden = hideHistoryList
         }
     }
 }
