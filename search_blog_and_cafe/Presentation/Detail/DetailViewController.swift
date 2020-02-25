@@ -95,7 +95,7 @@ class DetailViewController: UIViewController {
         }
         
         thumbnailImageView.snp.makeConstraints {
-            $0.width.height.equalTo(80)
+            $0.width.height.equalTo(250)
         }
         
         urlLabel.snp.makeConstraints {
@@ -115,7 +115,7 @@ extension Reactive where Base: DetailViewController {
     var layoutComponents: Binder<SearchListCellData> {
         return Binder(base) { base, data in
             base.title = data.type.title
-            base.thumbnailImageView.kf.setImage(with: data.thumbnailURL)
+            base.thumbnailImageView.kf.setImage(with: data.thumbnailURL, placeholder: #imageLiteral(resourceName: "thumbnail_placeholder"))
             base.nameLabel.text = data.name
             base.titleLabel.text = data.title
             base.contentLabel.text = data.contents
