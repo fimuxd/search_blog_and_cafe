@@ -16,14 +16,13 @@ struct MainViewModel: MainViewBindable {
     let searchViewModel = SearchViewModel()
     let searchListViewModel = SearchListViewModel()
     let historyListViewModel = HistoryListViewModel()
+    let typeListViewModel = TypeListViewModel()
     
-    let typeListCellData: Driver<[FilterType]>
     let presentAlert: Signal<Void>
-    let isTypeListHidden: Signal<Bool>
     let push: Driver<Pushable>
-    let showHistoryList: Signal<Bool>
+    let isTypeListHidden: Signal<Bool>
+    let isHistoryListHidden: Signal<Bool>
     
-    let typeSelected = PublishRelay<FilterType>()
     let alertActionTapped = PublishRelay<AlertAction>()
     
     private let blogData = PublishSubject<DKBlog?>()
@@ -32,36 +31,43 @@ struct MainViewModel: MainViewBindable {
     
     init(model: MainModel = MainModel()) {
         //MARK: ViewModel -> View
-        typeListCellData = Driver.of([FilterType.all, FilterType.blog, FilterType.cafe])
-        
         presentAlert = searchListViewModel.headerViewModel.sortButtonTapped
             .asSignal(onErrorSignalWith: .empty())
-        
-        isTypeListHidden = Observable
-            .merge(
-                searchListViewModel.headerViewModel.typeButtonTapped.map { false },
-                typeSelected.map { _ in true }
-            )
-            .startWith(true)
-            .asSignal(onErrorJustReturn: true)
         
         push = searchListViewModel.itemSelected
             .withLatestFrom(cellData) { $1[$0] }
             .map { DetailViewModel(data: $0) }
             .map { PushableView.detailView($0) }
             .asDriver(onErrorDriveWith: .empty())
-
-        typeSelected
-            .bind(to: searchListViewModel.headerViewModel.shouldUpdateType)
-            .disposed(by: disposeBag)
         
-        showHistoryList = Observable
+        isTypeListHidden = Observable
             .merge(
                 searchViewModel.textDidBeginEditing.map { true },
-                searchViewModel.searchButtonTapped.map { false },
-                historyListViewModel.itemSelected.map { _ in false }
+                searchListViewModel.headerViewModel.sortButtonTapped.map { true },
+                searchListViewModel.headerViewModel.typeButtonTapped.map { false },
+                searchListViewModel.didScroll.map { true },
+                typeListViewModel.typeSelected.map { _ in true }
             )
+            .startWith(true)
             .asSignal(onErrorJustReturn: true)
+        
+        isHistoryListHidden = Observable
+            .merge(
+                searchViewModel.textDidBeginEditing.map { false },
+                searchViewModel.searchButtonTapped.map { true },
+                searchListViewModel.didScroll.map { true },
+                historyListViewModel.itemSelected.map { _ in true }
+            )
+            .asSignal(onErrorJustReturn: false)
+
+        //MARK: ViewModel -> ViewModel
+        searchListViewModel.didScroll
+            .bind(to: searchViewModel.shouldEndEditing)
+            .disposed(by: disposeBag)
+
+        typeListViewModel.typeSelected
+            .bind(to: searchListViewModel.headerViewModel.shouldUpdateType)
+            .disposed(by: disposeBag)
         
         historyListViewModel.selectedHistory
             .bind(to: searchViewModel.shouldUpdateQueryText)
@@ -173,12 +179,12 @@ struct MainViewModel: MainViewBindable {
                 return error.message
             }
         
-        let blogFiltered = typeSelected
+        let blogFiltered = typeListViewModel.typeSelected
             .filter { $0 == .blog }
             .withLatestFrom(blogValue)
             .map(model.blogResultToCellData)
         
-        let cafeFiltered = typeSelected
+        let cafeFiltered = typeListViewModel.typeSelected
             .filter { $0 == .cafe }
             .withLatestFrom(cafeValue)
             .map(model.cafeResultToCellData)
