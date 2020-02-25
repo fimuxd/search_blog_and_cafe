@@ -9,31 +9,6 @@
 import RxSwift
 import RxCocoa
 
-struct DetailModel {
-    let userDefaults: UserDefaults
-    
-    init() {
-        self.userDefaults = UserDefaults.standard
-        initUserDefault()
-    }
-    
-    func initUserDefault() {
-        guard userDefaults.array(forKey: "url_tapped_id") == nil else {
-            return
-        }
-        userDefaults.set([Int](), forKey: "url_tapped_id")
-    }
-    
-    func setDataToUserDefault(_ id: Int) {
-        guard var tappedIDList = userDefaults.array(forKey: "url_tapped_id") as? [Int],
-            !tappedIDList.contains(id) else {
-            return
-        }
-        tappedIDList.append(id)
-        userDefaults.set(tappedIDList, forKey: "url_tapped_id")
-    }
-}
-
 struct DetailViewModel: DetailViewBindable {
     let layoutComponents: Signal<SearchListCellData>
     let push: Driver<Pushable>
