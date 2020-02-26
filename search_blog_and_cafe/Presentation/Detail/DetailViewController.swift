@@ -63,20 +63,21 @@ class DetailViewController: UIViewController {
         contentView.alignment = .fill
         contentView.axis = .vertical
         contentView.distribution = .fill
-        contentView.spacing = 8
+        contentView.spacing = 12
         
         thumbnailImageView.contentMode = .scaleAspectFit
         
-        nameLabel.font = .systemFont(ofSize: 20, weight: .bold)
-        nameLabel.font = .systemFont(ofSize: 16)
+        nameLabel.font = .systemFont(ofSize: 28, weight: .bold)
+        titleLabel.font = .systemFont(ofSize: 16)
         titleLabel.numberOfLines = 2
         contentLabel.font = .systemFont(ofSize: 14)
         contentLabel.numberOfLines = 0
-        datetimeLabel.font = .systemFont(ofSize: 12)
-        urlLabel.font =  .systemFont(ofSize: 14, weight: .light)
+        datetimeLabel.font = .systemFont(ofSize: 12, weight: .light)
+        urlLabel.font = .systemFont(ofSize: 14, weight: .light)
         
         urlButton.setTitle("바로가기", for: .normal)
         urlButton.setTitleColor(.systemBlue, for: .normal)
+        urlButton.titleLabel?.font = .systemFont(ofSize: 14)
     }
     
     private func layout() {
@@ -95,17 +96,16 @@ class DetailViewController: UIViewController {
         }
         
         thumbnailImageView.snp.makeConstraints {
-            $0.width.height.equalTo(250)
+            $0.width.height.equalTo(240)
         }
         
         urlLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview()
-            $0.leading.equalToSuperview().offset(8)
+            $0.top.bottom.leading.equalToSuperview()
         }
         
         urlButton.snp.makeConstraints {
             $0.centerY.equalTo(urlLabel)
-            $0.trailing.equalToSuperview().inset(8)
+            $0.trailing.equalToSuperview()
             $0.leading.equalTo(urlLabel.snp.trailing).offset(8)
         }
     }
@@ -137,7 +137,7 @@ extension Reactive where Base: DetailViewController {
             }
             
             base.datetimeLabel.text = datetime
-            base.urlLabel.text = data.thumbnailURL?.absoluteString
+            base.urlLabel.text = data.url?.absoluteString
         }
     }
 }

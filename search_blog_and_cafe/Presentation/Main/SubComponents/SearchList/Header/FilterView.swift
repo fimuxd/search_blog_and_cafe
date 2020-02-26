@@ -53,6 +53,8 @@ class FilterView: UITableViewHeaderFooterView {
     
     private func attribute() {
         typeButton.setTitleColor(.systemBlue, for: .normal)
+        typeButton.contentHorizontalAlignment = .left
+        
         sortButton.setImage(#imageLiteral(resourceName: "list"), for: .normal)
         bottomBorder.backgroundColor = .lightGray
     }
@@ -61,14 +63,15 @@ class FilterView: UITableViewHeaderFooterView {
         [typeButton, typeList, sortButton, bottomBorder].forEach { addSubview($0) }
         
         typeButton.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.equalToSuperview().offset(20)
         }
         
         sortButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(typeButton.snp.trailing)
-            $0.trailing.equalToSuperview()
-            $0.width.height.equalTo(35)
+            $0.leading.equalTo(typeButton.snp.trailing).offset(12)
+            $0.trailing.equalToSuperview().inset(12)
+            $0.width.height.equalTo(28)
         }
         
         bottomBorder.snp.makeConstraints {

@@ -66,6 +66,10 @@ struct MainModel {
     }
     
     func combineCellData(_ prev: [SearchListCellData], _ input: (data: [SearchListCellData], type: FilterType)) -> [SearchListCellData] {
+        guard !input.data.isEmpty else {
+            return []
+        }
+        
         switch input.type {
         case .all:
             return prev + input.data

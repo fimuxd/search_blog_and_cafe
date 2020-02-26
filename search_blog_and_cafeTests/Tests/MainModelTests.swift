@@ -71,6 +71,7 @@ class MainModelTests: XCTestCase {
     func testCombineCellData() {
         let combineCellData0 = model.combineCellData(cellData0, (cellData1, .blog))
         let combineCellData1 = model.combineCellData(cellData0, (cellData1, .cafe))
+        let combineCellData2 = model.combineCellData(cellData1, ([], .blog))
         
         expect(combineCellData0).to(
             equal(cellData0 + cellData1),
@@ -80,6 +81,11 @@ class MainModelTests: XCTestCase {
         expect(combineCellData1).to(
             equal([]),
             description: "설정한 타입의 cell data를 방출해야하며, cellData0, cellData1 모두 blog 타입의 cell만 보유하므로 빈 값을 반환해야 합니다."
+        )
+        
+        expect(combineCellData2).to(
+            equal([]),
+            description: "새로 입력된 cellData 배열(input.data)이 빈 값이라면 빈 배열을 반환해야 합니다."
         )
     }
     

@@ -49,11 +49,11 @@ struct MainViewModel: MainViewBindable {
                 searchViewModel.shouldLoadResult,
                 historyListViewModel.selectedHistory
             )
-            .do(onNext: { [weak cellData, weak blogData, weak cafeData] _ in
-                cellData?.onNext([])
+            .do(onNext: { [weak blogData, weak cafeData] _ in
                 blogData?.onNext(nil)
                 cafeData?.onNext(nil)
             })
+            .share()
         
         let searchCondition = Observable
             .combineLatest(
@@ -171,8 +171,8 @@ struct MainViewModel: MainViewBindable {
         //MARK: CellData
         let paging = Observable
             .merge(
-                blogValue.map(model.blogResultToCellData),
-                cafeValue.map(model.cafeResultToCellData)
+                blogData.map(model.blogResultToCellData),
+                cafeData.map(model.cafeResultToCellData)
             )
             .withLatestFrom(searchCondition) { (data: $0, type: $1.type) }
             .scan([SearchListCellData](), accumulator: model.combineCellData)
